@@ -147,4 +147,38 @@ def solve_puzzle(puzzle):
             else:
                 puzzle[current[0]][current[1]] += 1 # no solution for following puzzle spaces
 
+def validate_solution(solved_puzzle):
+    """Takes a completed 9x9 grid and verifies that there is
+    one of each number in every column, row, and 3x3 block.
+    Returns True if solution is valid, False if not"""
+
+    # check rows
+    for i in range(9):
+        for j in range(1, 10):
+            if j not in solved_puzzle[i]:
+                return False
+
+    # check columns     
+    for i in range(9):
+        column_list = []
+        for j in range(9):
+            column_list.append(solved_puzzle[j][i])
+        for k in range(1, 10):
+            if k not in column_list:
+                return False
+
+    # check 3x3 blocks
+    block_ends = [(0, 3), (3, 6), (6, 9)]
+    for x_range in block_ends:
+        for y_range in block_ends:
+            block_list = []
+            for i in range(*x_range):
+                block_list += solved_puzzle[i][y_range[0]:y_range[1]]
+
+            for i in range(1, 10):
+                if i not in block_list:
+                    return False
+      
+    return True
+
 
