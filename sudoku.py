@@ -134,35 +134,46 @@ def solve_gui(entry_list):
     puzzle = []
     puzzle_hints = []
     
+    # copy entry hints to puzzle list as integers
     for entry_row in entry_list:
         puzzle_row = []
         for entry in entry_row:
             entry_value = entry.get()
             if entry_value == "":
                 entry_value = 0
-            puzzle_row.append(int(entry_value))
+            try:
+                if 0 <= int(entry_value) < 10:
+                    puzzle_row.append(int(entry_value))
+                else:
+                    messagebox.showwarning(title="Invalid Sudoku", message="Clue Out of Range")
+            except:
+                messagebox.showwarning(title="Invalid Sudoku", message="Invalid Clue Selected")
+                return False
         puzzle.append(puzzle_row)
         puzzle_hints.append([i for i in puzzle_row])
         puzzle_row = []
     
+    # solve puzzle with given hints in puzzle list
     if solve_puzzle(puzzle):
         for row in range(9):
             for column in range(9):
                 entry_list[row][column].delete(0, "end")
                 entry_list[row][column].insert(0, str(puzzle[row][column]))
-                
-            # TODO ################################
 
-                if puzzle_hints[row][column] == entry_list[row][column]:
+                # make solution numbers red
+                if puzzle_hints[row][column] != puzzle[row][column]:
                     entry_list[row][column].config(fg = "red")
     else:
-        messagebox.showwarning(title="Invalid", message="Invalid Sudoku: No Solution")
+        messagebox.showwarning(title="Invalid Sudoku", message="No Possible Solution")
+    
+    return True
 
 
 def reset_grid(entry_list):
     """Reset the sudoku board to empty"""
     for row in entry_list:
         for entry in row:
+            entry.config(fg="black")
             entry.delete(0, "end")
 
 
@@ -229,6 +240,8 @@ def sudoku_gui():
 
 if __name__ == "__main__":
     sudoku_gui()
+
+
 
 
 # Test Puzzles
