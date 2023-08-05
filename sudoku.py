@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 
 
 def print_puzzle(puzzle):
@@ -186,7 +187,7 @@ def sudoku_gui():
     root = tk.Tk()
     root.geometry("350x410")
     root.title("Sudoku Solver")
-    main_window = tk.Frame(root, highlightbackground="black", highlightthickness=1)
+    main_window = tk.Frame(root, highlightbackground="black", highlightthickness=1, bg="black")
     main_window.grid(row = 0, rowspan = 9, column = 0, columnspan = 9, padx = 15, pady = 5)
 
     # make 2D list of Entries representing number spaces on board
@@ -199,12 +200,20 @@ def sudoku_gui():
             entry_sublist.append(new_entry)
         entry_list.append(entry_sublist)
 
+    # grid cursor navigation 
+    for i in range(9):
+        for j in range(9):
+            entry_list[i][j].bind("<Left>", lambda event, row=i, column=j: entry_list[row][column - 1].focus())
+            entry_list[i][j].bind("<Right>", lambda event, row=i, column=j: entry_list[row][(column + 1) % 9].focus())
+            entry_list[i][j].bind("<Up>", lambda event, row=i, column=j: entry_list[row - 1][column].focus())
+            entry_list[i][j].bind("<Down>", lambda event, row=i, column=j: entry_list[(row + 1) % 9][column].focus())
+
     # row and column dividers for 3x3 blocks
     for entry in entry_list[2] + entry_list[5]:
-        entry.grid_configure(pady = (0, 6))
+        entry.grid_configure(pady = (0, 1))
     for i in range(9):
-        entry_list[i][2].grid_configure(padx = (0, 6))
-        entry_list[i][5].grid_configure(padx = (0, 6))
+        entry_list[i][2].grid_configure(padx = (0, 1))
+        entry_list[i][5].grid_configure(padx = (0, 1))
     
     solve_button = tk.Button(root, text = "Solve", width = 10, border = 5, command = lambda: solve_gui(entry_list))
     solve_button.grid(row = 10, column = 2, pady = 10)
@@ -242,9 +251,7 @@ if __name__ == "__main__":
     sudoku_gui()
 
 
-
-
-# Test Puzzles
+###### Test Puzzles ######
 grid1 = [
     [9, 2, 6, 1, 7, 8, 5, 4, 3],
     [4, 7, 3, 6, 5, 2, 1, 9, 8],
