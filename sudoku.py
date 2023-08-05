@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 
 
 def print_puzzle(puzzle):
@@ -131,6 +132,7 @@ def solve_gui(entry_list):
     """Takes the clues in the entries given by entry list
     and inputs to solve_puzzle function"""
     puzzle = []
+    puzzle_hints = []
     
     for entry_row in entry_list:
         puzzle_row = []
@@ -140,18 +142,28 @@ def solve_gui(entry_list):
                 entry_value = 0
             puzzle_row.append(int(entry_value))
         puzzle.append(puzzle_row)
+        puzzle_hints.append([i for i in puzzle_row])
         puzzle_row = []
-
-    solve_puzzle(puzzle)
-
-    if validate_solution(puzzle):
+    
+    if solve_puzzle(puzzle):
         for row in range(9):
             for column in range(9):
                 entry_list[row][column].delete(0, "end")
                 entry_list[row][column].insert(0, str(puzzle[row][column]))
-    else:
-        return False
+                
+            # TODO ################################
 
+                if puzzle_hints[row][column] == entry_list[row][column]:
+                    entry_list[row][column].config(fg = "red")
+    else:
+        messagebox.showwarning(title="Invalid", message="Invalid Sudoku: No Solution")
+
+
+def reset_grid(entry_list):
+    """Reset the sudoku board to empty"""
+    for row in entry_list:
+        for entry in row:
+            entry.delete(0, "end")
 
 
 def sudoku_gui():
@@ -161,10 +173,10 @@ def sudoku_gui():
     functions."""
 
     root = tk.Tk()
-    root.geometry("450x400")
+    root.geometry("350x410")
     root.title("Sudoku Solver")
     main_window = tk.Frame(root, highlightbackground="black", highlightthickness=1)
-    main_window.pack()
+    main_window.grid(row = 0, rowspan = 9, column = 0, columnspan = 9, padx = 15, pady = 5)
 
     # make 2D list of Entries representing number spaces on board
     entry_list = []
@@ -184,7 +196,10 @@ def sudoku_gui():
         entry_list[i][5].grid_configure(padx = (0, 6))
     
     solve_button = tk.Button(root, text = "Solve", width = 10, border = 5, command = lambda: solve_gui(entry_list))
-    solve_button.pack(pady = 15)
+    solve_button.grid(row = 10, column = 2, pady = 10)
+
+    reset_button = tk.Button(root, text = "Reset", width = 10, border = 5, command = lambda: reset_grid(entry_list))
+    reset_button.grid(row = 10, column = 6, pady = 10)
 
 
     grid4 = [
