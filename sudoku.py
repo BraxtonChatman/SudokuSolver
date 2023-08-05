@@ -1,66 +1,10 @@
+import tkinter as tk
 
 
-# empty 9x9 grid filled with 0's
-grid = []
-for i in range(9):
-    grid.append([0] * 9)
-
-
-grid = [
-    [9, 2, 6, 1, 7, 8, 5, 4, 3],
-    [4, 7, 3, 6, 5, 2, 1, 9, 8],
-    [8, 5, 1, 9, 4, 3, 6, 2, 7],
-    [6, 8, 5, 2, 3, 1, 9, 7, 4],
-    [7, 3, 4, 8, 9, 5, 2, 6, 1],
-    [2, 1, 9, 4, 6, 7, 8, 3, 5],
-    [5, 6, 8, 7, 2, 4, 3, 1, 9],
-    [3, 4, 2, 5, 1, 9, 7, 8, 6],
-    [1, 9, 7, 3, 8, 6, 4, 5, 0]
-]
-# 2
-
-grid2 = [
-    [0, 0, 0, 0, 0, 1, 2, 3, 0],
-    [1, 2, 3, 0, 0, 8, 0, 4, 0],
-    [8, 0, 4, 0, 0, 7, 6, 5, 0],
-    [7, 6, 5, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 2, 3],
-    [0, 1, 2, 3, 0, 0, 8, 0, 4],
-    [0, 8, 0, 4, 0, 0, 7, 6, 5],
-    [0, 7, 6, 5, 0, 0, 0, 0, 0],
-]
-    # [6, 5, 7, 9, 4, 1, 2, 3, 8]
-    # [1, 2, 3, 6, 5, 8, 9, 4, 7]
-    # [8, 9, 4, 2, 3, 7, 6, 5, 1]
-    # [7, 6, 5, 1, 2, 3, 4, 8, 9]
-    # [2, 3, 1, 8, 9, 4, 5, 7, 6]
-    # [9, 4, 8, 7, 6, 5, 1, 2, 3]
-    # [5, 1, 2, 3, 7, 6, 8, 9, 4]
-    # [3, 8, 9, 4, 1, 2, 7, 6, 5]
-    # [4, 7, 6, 5, 8, 9, 3, 1, 2]
-
-
-grid3 = [
-    [0, 7, 5, 0, 9, 0, 0, 0, 6],
-    [0, 2, 3, 0, 8, 0, 0, 4, 0],
-    [8, 0, 0, 0, 0, 3, 0, 0, 1],
-    [5, 0, 0, 7, 0, 2, 0, 0, 0],
-    [0, 4, 0, 8, 0, 6, 0, 2, 0],
-    [0, 0, 0, 9, 0, 1, 0, 0, 3],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 6, 0, 0, 0, 0, 0, 0, 0],
-    [7, 0, 0, 0, 0, 0, 0, 0, 0],
-]
-    # [1, 7, 5, 2, 9, 4, 3, 8, 6]
-    # [6, 2, 3, 1, 8, 5, 7, 4, 9]
-    # [8, 9, 4, 6, 7, 3, 2, 5, 1]
-    # [5, 1, 6, 7, 3, 2, 4, 9, 8]
-    # [3, 4, 9, 8, 5, 6, 1, 2, 7]
-    # [2, 8, 7, 9, 4, 1, 5, 6, 3]
-    # [9, 3, 1, 4, 2, 8, 6, 7, 5]
-    # [4, 6, 8, 5, 1, 7, 9, 3, 2]
-    # [7, 5, 2, 3, 6, 9, 8, 1, 4]
+def print_puzzle(puzzle):
+    """Prints puzzle in individual row format"""
+    for row in puzzle:
+        print(row)
 
 
 def has_empty(puzzle):
@@ -147,6 +91,7 @@ def solve_puzzle(puzzle):
             else:
                 puzzle[current[0]][current[1]] += 1 # no solution for following puzzle spaces
 
+
 def validate_solution(solved_puzzle):
     """Takes a completed 9x9 grid and verifies that there is
     one of each number in every column, row, and 3x3 block.
@@ -182,3 +127,201 @@ def validate_solution(solved_puzzle):
     return True
 
 
+def solve_gui(entry_list):
+    """Takes the clues in the entries given by entry list
+    and inputs to solve_puzzle function"""
+    puzzle = []
+    
+    for entry_row in entry_list:
+        puzzle_row = []
+        for entry in entry_row:
+            entry_value = entry.get()
+            if entry_value == "":
+                entry_value = 0
+            puzzle_row.append(int(entry_value))
+        puzzle.append(puzzle_row)
+        puzzle_row = []
+
+    solve_puzzle(puzzle)
+
+    if validate_solution(puzzle):
+        for row in range(9):
+            for column in range(9):
+                entry_list[row][column].delete(0, "end")
+                entry_list[row][column].insert(0, str(puzzle[row][column]))
+    else:
+        return False
+
+
+
+def sudoku_gui():
+    """Function to present sudoku solver GUI with
+    representation for empty puzzle and ability to input
+    current clues. Calls solve_puzzle and validate_solution
+    functions."""
+
+    root = tk.Tk()
+    root.geometry("450x400")
+    root.title("Sudoku Solver")
+    main_window = tk.Frame(root, highlightbackground="black", highlightthickness=1)
+    main_window.pack()
+
+    # make 2D list of Entries representing number spaces on board
+    entry_list = []
+    for grid_row in range(9):
+        entry_sublist = []
+        for grid_column in range(9):
+            new_entry = tk.Entry(main_window, width = 2, font = "Calibri 20")
+            new_entry.grid(row = grid_row, column = grid_column, ipadx = 1)
+            entry_sublist.append(new_entry)
+        entry_list.append(entry_sublist)
+
+    # row and column dividers for 3x3 blocks
+    for entry in entry_list[2] + entry_list[5]:
+        entry.grid_configure(pady = (0, 6))
+    for i in range(9):
+        entry_list[i][2].grid_configure(padx = (0, 6))
+        entry_list[i][5].grid_configure(padx = (0, 6))
+    
+    solve_button = tk.Button(root, text = "Solve", width = 10, border = 5, command = lambda: solve_gui(entry_list))
+    solve_button.pack(pady = 15)
+
+
+    grid4 = [
+        [0, 0, 3, 0, 0, 4, 5, 0, 2],
+        [0, 5, 0, 0, 0, 3, 0, 0, 0],
+        [0, 0, 8, 0, 0, 5, 3, 6, 0],
+        [0, 0, 0, 2, 0, 0, 7, 4, 3],
+        [2, 7, 0, 3, 0, 0, 0, 8, 0],
+        [3, 4, 0, 7, 5, 0, 0, 0, 0],
+        [0, 0, 5, 4, 0, 0, 0, 0, 6],
+        [9, 0, 2, 0, 0, 0, 0, 5, 0],
+        [4, 0, 0, 0, 0, 2, 9, 0, 0]
+    ]
+
+    for i in range(9):
+        for j in range(9):
+            entry_list[i][j].delete(0, "end")
+            if grid4[i][j] == 0:
+                entry_list[i][j].insert(0, "")
+            else:
+                entry_list[i][j].insert(0, str(grid4[i][j]))
+
+
+
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    sudoku_gui()
+
+
+# Test Puzzles
+grid1 = [
+    [9, 2, 6, 1, 7, 8, 5, 4, 3],
+    [4, 7, 3, 6, 5, 2, 1, 9, 8],
+    [8, 5, 1, 9, 4, 3, 6, 2, 7],
+    [6, 8, 5, 2, 3, 1, 9, 7, 4],
+    [7, 3, 4, 8, 9, 5, 2, 6, 1],
+    [2, 1, 9, 4, 6, 7, 8, 3, 5],
+    [5, 6, 8, 7, 2, 4, 3, 1, 9],
+    [3, 4, 2, 5, 1, 9, 7, 8, 6],
+    [1, 9, 7, 3, 8, 6, 4, 5, 0]
+]
+sol1 = [
+    [9, 2, 6, 1, 7, 8, 5, 4, 3],
+    [4, 7, 3, 6, 5, 2, 1, 9, 8],
+    [8, 5, 1, 9, 4, 3, 6, 2, 7],
+    [6, 8, 5, 2, 3, 1, 9, 7, 4],
+    [7, 3, 4, 8, 9, 5, 2, 6, 1],
+    [2, 1, 9, 4, 6, 7, 8, 3, 5],
+    [5, 6, 8, 7, 2, 4, 3, 1, 9],
+    [3, 4, 2, 5, 1, 9, 7, 8, 6],
+    [1, 9, 7, 3, 8, 6, 4, 5, 2]
+]
+
+
+grid2 = [
+    [0, 0, 0, 0, 0, 1, 2, 3, 0],
+    [1, 2, 3, 0, 0, 8, 0, 4, 0],
+    [8, 0, 4, 0, 0, 7, 6, 5, 0],
+    [7, 6, 5, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 2, 3],
+    [0, 1, 2, 3, 0, 0, 8, 0, 4],
+    [0, 8, 0, 4, 0, 0, 7, 6, 5],
+    [0, 7, 6, 5, 0, 0, 0, 0, 0],
+] 
+sol2 = [
+    [6, 5, 7, 9, 4, 1, 2, 3, 8],
+    [1, 2, 3, 6, 5, 8, 9, 4, 7],
+    [8, 9, 4, 2, 3, 7, 6, 5, 1],
+    [7, 6, 5, 1, 2, 3, 4, 8, 9],
+    [2, 3, 1, 8, 9, 4, 5, 7, 6],
+    [9, 4, 8, 7, 6, 5, 1, 2, 3],
+    [5, 1, 2, 3, 7, 6, 8, 9, 4],
+    [3, 8, 9, 4, 1, 2, 7, 6, 5],
+    [4, 7, 6, 5, 8, 9, 3, 1, 2]
+]
+
+
+grid3 = [
+    [0, 7, 5, 0, 9, 0, 0, 0, 6],
+    [0, 2, 3, 0, 8, 0, 0, 4, 0],
+    [8, 0, 0, 0, 0, 3, 0, 0, 1],
+    [5, 0, 0, 7, 0, 2, 0, 0, 0],
+    [0, 4, 0, 8, 0, 6, 0, 2, 0],
+    [0, 0, 0, 9, 0, 1, 0, 0, 3],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 6, 0, 0, 0, 0, 0, 0, 0],
+    [7, 0, 0, 0, 0, 0, 0, 0, 0],
+]
+sol3 = [
+    [1, 7, 5, 2, 9, 4, 3, 8, 6],
+    [6, 2, 3, 1, 8, 5, 7, 4, 9],
+    [8, 9, 4, 6, 7, 3, 2, 5, 1],
+    [5, 1, 6, 7, 3, 2, 4, 9, 8],
+    [3, 4, 9, 8, 5, 6, 1, 2, 7],
+    [2, 8, 7, 9, 4, 1, 5, 6, 3],
+    [9, 3, 1, 4, 2, 8, 6, 7, 5],
+    [4, 6, 8, 5, 1, 7, 9, 3, 2],
+    [7, 5, 2, 3, 6, 9, 8, 1, 4]
+]
+
+
+grid4 = [
+    [0, 0, 3, 0, 0, 4, 5, 0, 2],
+    [0, 5, 0, 0, 0, 3, 0, 0, 0],
+    [0, 0, 8, 0, 0, 5, 3, 6, 0],
+    [0, 0, 0, 2, 0, 0, 7, 4, 3],
+    [2, 7, 0, 3, 0, 0, 0, 8, 0],
+    [3, 4, 0, 7, 5, 0, 0, 0, 0],
+    [0, 0, 5, 4, 0, 0, 0, 0, 6],
+    [9, 0, 2, 0, 0, 0, 0, 5, 0],
+    [4, 0, 0, 0, 0, 2, 9, 0, 0]
+]
+sol4 = [
+    [6, 9, 3, 1, 8, 4, 5, 7, 2],
+    [7, 5, 4, 6, 2, 3, 8, 1, 9],
+    [1, 2, 8, 9, 7, 5, 3, 6, 4],
+    [5, 8, 1, 2, 6, 9, 7, 4, 3],
+    [2, 7, 9, 3, 4, 1, 6, 8, 5],
+    [3, 4, 6, 7, 5, 8, 2, 9, 1],
+    [8, 3, 5, 4, 9, 7, 1, 2, 6],
+    [9, 1, 2, 8, 3, 6, 4, 5, 7],
+    [4, 6, 7, 5, 1, 2, 9, 3, 8]
+]
+
+
+
+grid5 = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 3, 0, 8, 5],
+    [0, 0, 1, 0, 2, 0, 0, 0, 0],
+    [0, 0, 0, 5, 0, 7, 0, 0, 0],
+    [0, 0, 4, 0, 0, 0, 1, 0, 0],
+    [0, 9, 0, 0, 0, 0, 0, 0, 0],
+    [5, 0, 0, 0, 0, 0, 0, 7, 3],
+    [0, 0, 2, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 4, 0, 0, 0, 9],
+]
